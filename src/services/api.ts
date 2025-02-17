@@ -1,40 +1,43 @@
 
 import { supabase } from '@/lib/supabase';
-import type { Profile, Subscription, Payment, SubscriptionUser } from '@/types/database';
+import type { Profile, Plan, Subscription, SubscriptionUser, Payment } from '@/types/database';
 
 export const api = {
-  // User operations
-  async getUsers() {
+  // Plans operations
+  async getPlans() {
     const { data, error } = await supabase
-      .from('profiles')
+      .from('plans')
       .select('*')
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data as Profile[];
+    return data as Plan[];
   },
 
-  async updateUserBalance(userId: string, balance: number) {
+  async createPlan(plan: Omit<Plan, 'id' | 'created_at'>) {
     const { data, error } = await supabase
-      .from('profiles')
-      .update({ balance })
-      .eq('id', userId)
+      .from('plans')
+      .insert(plan)
       .select()
       .single();
     
     if (error) throw error;
-    return data as Profile;
+    return data as Plan;
   },
 
-  // Subscription operations
+  // Subscriptions operations
   async getSubscriptions() {
     const { data, error } = await supabase
       .from('subscriptions')
-      .select('*')
+      .select(`
+        *,
+        plans:plan_id (*),
+        profiles:owner_id (*)
+      `)
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data as Subscription[];
+    return data;
   },
 
   async createSubscription(subscription: Omit<Subscription, 'id' | 'created_at'>) {
@@ -48,10 +51,10 @@ export const api = {
     return data as Subscription;
   },
 
-  async updateSubscription(id: string, subscription: Partial<Subscription>) {
+  async updateSubscriptionStatus(id: string, status: Subscription['status']) {
     const { data, error } = await supabase
       .from('subscriptions')
-      .update(subscription)
+      .update({ status })
       .eq('id', id)
       .select()
       .single();
@@ -60,23 +63,28 @@ export const api = {
     return data as Subscription;
   },
 
-  // Payment operations
-  async getPayments() {
+  // Subscription Users operations
+  async addUserToSubscription(subscriptionUser: Omit<SubscriptionUser, 'created_at'>) {
     const { data, error } = await supabase
-      .from('payments')
-      .select(`
-        *,
-        profiles:user_id (
-          name,
-          email
-        )
-      `)
-      .order('created_at', { ascending: false });
+      .from('subscription_users')
+      .insert(subscriptionUser)
+      .select()
+      .single();
     
     if (error) throw error;
-    return data as (Payment & { profiles: Profile })[];
+    return data as SubscriptionUser;
   },
 
+  async removeUserFromSubscription(subscriptionId: string, userId: string) {
+    const { error } = await supabase
+      .from('subscription_users')
+      .delete()
+      .match({ subscription_id: subscriptionId, user_id: userId });
+    
+    if (error) throw error;
+  },
+
+  // Payments operations
   async createPayment(payment: Omit<Payment, 'id' | 'created_at'>) {
     const { data, error } = await supabase
       .from('payments')
@@ -88,28 +96,27 @@ export const api = {
     return data as Payment;
   },
 
-  // Subscription Users operations
-  async getSubscriptionUsers(subscriptionId: string) {
+  async getPaymentsBySubscription(subscriptionId: string) {
     const { data, error } = await supabase
-      .from('subscription_users')
-      .select(`
-        *,
-        profiles:user_id (*)
-      `)
-      .eq('subscription_id', subscriptionId);
+      .from('payments')
+      .select('*')
+      .eq('subscription_id', subscriptionId)
+      .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data as (SubscriptionUser & { profiles: Profile })[];
+    return data as Payment[];
   },
 
-  async addUserToSubscription(subscriptionId: string, userId: string) {
+  // Profile operations
+  async updateUserRole(userId: string, role: Profile['role']) {
     const { data, error } = await supabase
-      .from('subscription_users')
-      .insert({ subscription_id: subscriptionId, user_id: userId })
+      .from('profiles')
+      .update({ role })
+      .eq('id', userId)
       .select()
       .single();
     
     if (error) throw error;
-    return data as SubscriptionUser;
-  },
+    return data as Profile;
+  }
 };

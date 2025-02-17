@@ -8,27 +8,37 @@ export interface Profile {
   created_at: string;
 }
 
-export interface Subscription {
+export interface Plan {
   id: string;
-  start_date: string;
-  end_date: string;
-  total_data: number;
+  name: string;
+  description: string;
   price: number;
-  status: 'active' | 'completed';
+  features: Record<string, any>;
+  max_users: number;
   created_at: string;
 }
 
-export interface Payment {
+export interface Subscription {
   id: string;
-  user_id: string;
-  subscription_id: string;
-  amount: number;
-  date: string;
+  plan_id: string;
+  owner_id: string;
+  start_date: string;
+  end_date: string;
+  status: 'active' | 'cancelled' | 'expired';
   created_at: string;
 }
 
 export interface SubscriptionUser {
   subscription_id: string;
   user_id: string;
+  role: 'owner' | 'member';
+  created_at: string;
+}
+
+export interface Payment {
+  id: string;
+  subscription_id: string;
+  amount: number;
+  status: 'pending' | 'completed' | 'failed';
   created_at: string;
 }
