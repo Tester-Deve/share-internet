@@ -9,7 +9,162 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          status: string | null
+          subscription_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          subscription_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          features: Json | null
+          id: string
+          max_users: number
+          name: string
+          price: number
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          features?: Json | null
+          id?: string
+          max_users: number
+          name: string
+          price: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          features?: Json | null
+          id?: string
+          max_users?: number
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          balance: number | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string | null
+          role: string | null
+        }
+        Insert: {
+          balance?: number | null
+          created_at?: string | null
+          email?: string | null
+          id: string
+          name?: string | null
+          role?: string | null
+        }
+        Update: {
+          balance?: number | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          role?: string | null
+        }
+        Relationships: []
+      }
+      subscription_users: {
+        Row: {
+          created_at: string | null
+          role: string | null
+          subscription_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          role?: string | null
+          subscription_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          role?: string | null
+          subscription_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_users_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          end_date: string
+          id: string
+          owner_id: string | null
+          plan_id: string | null
+          start_date: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_date: string
+          id?: string
+          owner_id?: string | null
+          plan_id?: string | null
+          start_date: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          owner_id?: string | null
+          plan_id?: string | null
+          start_date?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
