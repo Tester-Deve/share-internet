@@ -23,10 +23,10 @@ const Auth = () => {
         title: "Check your email",
         description: "We sent you a magic link to sign in",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -37,10 +37,10 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Could not sign in with Google. Please try again.",
+        description: error.message || "Could not sign in with Google. Please try again.",
         variant: "destructive",
       });
     }
