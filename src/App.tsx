@@ -11,6 +11,7 @@ import Payments from "./pages/payments";
 import History from "./pages/history";
 import Settings from "./pages/settings";
 import Auth from "./pages/auth";
+import SignUp from "./pages/auth/signup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,10 @@ const AppRoutes = () => {
       <Route
         path="/auth"
         element={user ? <Navigate to="/" replace /> : <Auth />}
+      />
+      <Route
+        path="/auth/signup"
+        element={user ? <Navigate to="/" replace /> : <SignUp />}
       />
       <Route
         path="/"
